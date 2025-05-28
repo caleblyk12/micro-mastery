@@ -6,8 +6,10 @@ import RegistrationPage from "../pages/RegistrationPage";
 import LoginPage from "../pages/LoginPage";
 import RegisteredPage from "../pages/RegisteredPage";
 
-import NavParentPage from "../pages/NavParentPage";
+import LayoutParent from "../pages/LayoutParent";
 import HomePage from "../pages/HomePage";
+import ProfilePage from "../pages/ProfilePage";
+import CategoriesPage from "../pages/CategoriesPage";
 
 const router = createBrowserRouter([
     {
@@ -29,11 +31,19 @@ const router = createBrowserRouter([
     },
     {
         path: '/nav',
-        element: <NavParentPage/>,
+        element: <LayoutParent/>,
         children: [
             {
                 path: 'home',
                 element: <HomePage/>
+            },
+            {
+                path: 'profile',
+                element: <ProfilePage/>
+            },
+            {
+                path: 'categories',
+                element: <CategoriesPage/>
             }
         ]
     }
