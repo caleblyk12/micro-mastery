@@ -26,19 +26,19 @@ function RegistrationPage() {
     }
 
     return(
-        <div>
-            <h2>Register</h2>
+        <div className='flex flex-col items-center pt-[100px] gap-2'>
+            <h2 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-8'>Register and start learning</h2>
 
-            {(errorMessage !== '') && <strong>{errorMessage}</strong> } <br/>
+            {(errorMessage !== '') && <strong>{errorMessage}</strong> } 
 
-            <input placeholder='Email...' value={email} type='email' onChange={(e) => setEmail(e.target.value)} required/> <br/>
-            <input placeholder="Password..." value={password} type='password' onChange={(e) => setPassword(e.target.value)} required/> <br/>
-            <button onClick={() => {setLoading(true); handleRegister()}}>Register</button> <br/>
+            <input className='input-default' placeholder='Email...' value={email} type='email' onChange={(e) => setEmail(e.target.value)} required/> 
+            <input className='input-default' placeholder="Password..." value={password} type='password' onChange={(e) => setPassword(e.target.value)} required/> 
+            <button className='button-default mb-8' onClick={() => {setLoading(true); handleRegister()}}>Register</button> 
 
-            {(loading) && <><strong>Loading...</strong><br/></>}
+            {(loading) && <><strong>Loading...</strong></>}
 
-            <span>Already have an account? </span>
-            <Link to='/login'>Login</Link>
+            <span>Already an active Micro-Master? </span>
+            <Link className='text-blue-700 hover:text-blue-300' to='/login'>Login</Link>
         </div>
     );
 }
