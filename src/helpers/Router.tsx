@@ -10,6 +10,7 @@ import LayoutParent from "../pages/LayoutParent";
 import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import CategoriesPage from "../pages/CategoriesPage";
+import Wrapper from "./Wrapper";
 
 const router = createBrowserRouter([
     {
@@ -31,7 +32,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/nav',
-        element: <LayoutParent/>,
+        element: <Wrapper><LayoutParent/></Wrapper>,
         children: [
             {
                 path: 'home',
