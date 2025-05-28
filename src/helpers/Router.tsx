@@ -11,6 +11,8 @@ import HomePage from "../pages/HomePage";
 import ProfilePage from "../pages/ProfilePage";
 import CategoriesPage from "../pages/CategoriesPage";
 import Wrapper from "./Wrapper";
+import CategoryPage from "../pages/CategoryPage";
+import SkillPage from "../pages/SkillPage";
 
 const router = createBrowserRouter([
     {
@@ -45,6 +47,14 @@ const router = createBrowserRouter([
             {
                 path: 'categories',
                 element: <CategoriesPage/>
+            },
+            {
+                path: 'category/:id',
+                element: <CategoryPage/>
+            },
+            {
+                path: 'skill/:id',
+                element: <SkillPage/>
             }
         ]
     }

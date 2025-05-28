@@ -8,10 +8,10 @@ function RegistrationPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     async function handleRegister() {
         const {error} = await supabase.auth.signUp({email: email, password: password});
-        
         setEmail('');
         setPassword('');
 
@@ -19,6 +19,7 @@ function RegistrationPage() {
             console.error('error signing up', error.message);
             setErrorMessage(error.message);
         } else {
+            setLoading(false);
             setErrorMessage('');
             navigate('/registered')
         }
@@ -32,7 +33,9 @@ function RegistrationPage() {
 
             <input placeholder='Email...' value={email} type='email' onChange={(e) => setEmail(e.target.value)} required/> <br/>
             <input placeholder="Password..." value={password} type='password' onChange={(e) => setPassword(e.target.value)} required/> <br/>
-            <button onClick={handleRegister}>Register</button> <br/>
+            <button onClick={() => {setLoading(true); handleRegister()}}>Register</button> <br/>
+
+            {(loading) && <><strong>Loading...</strong><br/></>}
 
             <span>Already have an account? </span>
             <Link to='/login'>Login</Link>
