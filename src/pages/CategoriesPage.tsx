@@ -28,13 +28,26 @@ function CategoriesPage() {
         fetchCategories();
     }, [])
 
-    return(
-        <div>
-            {categories.map((cat) => 
-                <div key={cat.id}>
-                    <button onClick={() => navigate(`/nav/category/${cat.id}`)}>{cat.title}</button>
+    return (
+        <div className="min-h-screen bg-white text-black px-4 py-6">
+            <div className="max-w-4xl mx-auto flex flex-col items-center">
+
+                {/* Page Title */}
+                <h1 className="text-3xl font-bold mb-6">Categories</h1>
+
+                {/* Categories Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                {categories.map((cat) => (
+                    <button
+                    key={cat.id}
+                    onClick={() => navigate(`/nav/category/${cat.id}`)}
+                    className="bg-black hover:bg-gray-50 text-white hover:text-black py-4 px-6 rounded-2xl shadow-md transition-colors duration-200 ease-in-out cursor-pointer text-lg font-medium"
+                    >
+                    {cat.title}
+                    </button>
+                ))}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

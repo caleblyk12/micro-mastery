@@ -56,11 +56,11 @@ function SkillPage() {
     return(
         <>
         {skill ? 
-            <div>
-                <h1>{skill.title}</h1>
+            <div className='flex flex-col gap-2 items-center mt-[50px]'>
+                <h1 className='text-3xl font-bold mb-4'>{skill.title}</h1>
                 <iframe 
-                    width="560" 
-                    height="315" 
+                    width="700" 
+                    height="394" 
                     src={skill.video_url} 
                     title={`${skill.title} video tutorial`} 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -68,7 +68,7 @@ function SkillPage() {
                     allowFullScreen></iframe>
                 
                 <br/>
-                <button onClick={handleDone}>I'm done</button>
+                <button className='button-default' onClick={handleDone}>I'm done</button>
             </div> : 
             
             <h1>Loading...</h1>

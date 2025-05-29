@@ -31,6 +31,7 @@ function ProfilePage() {
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [dailyStreak, setDailyStreak] = useState<number>(0);
 
 
     async function handleDeleteAvatar() {
@@ -74,6 +75,9 @@ function ProfilePage() {
         setAvatarUrl(publicUrlData.publicUrl + `?t=${Date.now()}`);
     }
 
+    function calculateDailyStreak(learnedSkills:SkillItem[]) {
+        return 0;
+    }
 
     useEffect(() => {
         async function fetchUser() {
@@ -155,6 +159,17 @@ function ProfilePage() {
         
     }, [userId]); 
 
+    useEffect(() => {
+        if (learnedSkills.length === 0) {
+            setDailyStreak(0);
+            return;
+        }
+        const streak = calculateDailyStreak(learnedSkills);
+        setDailyStreak(streak);
+    }, [learnedSkills]);
+
+
+
 
     if(loading) {
         return(
@@ -169,7 +184,7 @@ function ProfilePage() {
             {errorMessage && <strong>{errorMessage}</strong>}
 
             {/* Profile Picture Placeholder */}
-            <div className="flex flex-col items-center mb-[17%]">
+            <div className="flex flex-col items-center mb-4">
                 <div className="relative w-48 h-48 md:w-40 md:h-40">
                     <img
                         src={avatarUrl || placeholder}
@@ -199,6 +214,11 @@ function ProfilePage() {
                 
                 <h2 className="text-3xl font-bold">{username}</h2>
                 <p className="text-gray-500">Joined on: {joinedDate}</p>
+            </div>
+
+            {/*streak*/}
+            <div className="mb-[17%] text-white text-2xl text-center font-semibold bg-black rounded-4xl py-2">
+                Current Learning Streak: {dailyStreak} {dailyStreak === 1 ? 'day' : 'days'}
             </div>
 
             {/* Skills */}
