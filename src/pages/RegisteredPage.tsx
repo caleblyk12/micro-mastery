@@ -4,13 +4,16 @@ function RegisteredPage() {
 
     const navigate = useNavigate();
 
-    return(
-        <div>
-            <h2>Registration successful</h2>
-            <h4>Check your email for a confirmation link!</h4>
-            <button onClick={() => navigate('/')}>Back to start</button>
-        </div>
-    );
+    return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h2 className="text-4xl font-bold mb-2 text-black">Registration Successful</h2>
+        <h4 className="text-gray-600 mb-6">Check your email for a confirmation link!</h4>
+        <button onClick={() => navigate('/')} className="button-default">
+            Back to Start
+        </button>
+    </div>
+);
+
 }
 
 export default RegisteredPage;

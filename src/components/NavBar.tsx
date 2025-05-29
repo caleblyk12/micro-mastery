@@ -1,21 +1,58 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from 'react-router-dom';
+import orbitalDog from '../assets/orbitalDog256.png';
 
 function NavBar() {
-
     const navigate = useNavigate();
 
-    return(
+    return (
         <>
-        <div>
-            <Link to='/nav/home'>Home</Link>
-            <Link to='/nav/profile'>Profile</Link>
-            <Link to='/nav/categories'>Categories</Link>
-        </div>
-        <button onClick={() => navigate('/')}>Logout</button>
+            {/* Top-left icon */}
+            <div className="fixed top-8 left-6 z-50 flex items-center gap-2">
+                <img src={orbitalDog} className="w-8 h-8" />
+                <span className="text-lg font-bold">Micro-Mastery</span>
+            </div>
+
+            {/* Logout button below icon */}
+            <button
+                onClick={() => navigate('/')}
+                className="fixed top-6 right-6 z-50 button-default"
+            >
+                Logout
+            </button>
+
+            {/* Centered capsule navbar */}
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white shadow-[0_4px_12px_0_rgba(0,0,0,0.15),_0_-4px_12px_0_rgba(0,0,0,0.1)] rounded-full w-[50%] px-6 py-3 z-40 flex justify-evenly items-center">
+                <NavLink
+                    to="/nav/home"
+                    className={({ isActive }) =>
+                        isActive ? 'text-blue-700 font-semibold' : 'text-gray-800'
+                    }
+                >
+                    Home
+                </NavLink>
+                <NavLink
+                    to="/nav/profile"
+                    className={({ isActive }) =>
+                        isActive ? 'text-blue-700 font-semibold' : 'text-gray-800'
+                    }
+                >
+                    Profile
+                </NavLink>
+                <NavLink
+                    to="/nav/categories"
+                    className={({ isActive }) =>
+                        isActive ? 'text-blue-700 font-semibold' : 'text-gray-800'
+                    }
+                >
+                    Categories
+                </NavLink>
+            </div>
+
+            {/* Spacer to avoid overlap with fixed navbar */}
+            <div className="h-25" />
         </>
-        
     );
 }
 
 export default NavBar;
+
