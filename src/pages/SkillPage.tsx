@@ -43,12 +43,12 @@ function SkillPage() {
 
         if (error && error.message === 'duplicate key value violates unique constraint "users_learned_skills_pkey"') {
             console.error('ignore this error, skill data was not overwritten and user redirected')
-            navigate('/nav/home');
+            navigate('/nav/profile');
         }
         else if (error) {
             console.error('error inserting user learnt skill', error.message);
         } else {
-            navigate('/nav/home');
+            navigate('/nav/profile');
         }
         
     }
@@ -57,6 +57,12 @@ function SkillPage() {
         <>
         {skill ? 
             <div className='flex flex-col gap-2 items-center mt-[50px]'>
+                {/* Back button aligned left */}
+                <div className="w-[700px]">
+                    <button onClick={() => navigate(-1)} className="mb-6 text-blue-600 hover:text-blue-800 font-semibold cursor-pointer">
+                        ← Back
+                    </button>
+                </div>
                 <h1 className='text-3xl font-bold mb-4'>{skill.title}</h1>
                 <iframe 
                     width="700" 
@@ -67,8 +73,8 @@ function SkillPage() {
                     referrerPolicy="strict-origin-when-cross-origin" 
                     allowFullScreen></iframe>
                 
-                <br/>
-                <button className='button-default' onClick={handleDone}>I'm done</button>
+                
+                <button className='button-default mt-4' onClick={handleDone}>I'm done</button>
             </div> : 
             
             <h1>Loading...</h1>

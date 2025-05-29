@@ -75,8 +75,55 @@ function ProfilePage() {
         setAvatarUrl(publicUrlData.publicUrl + `?t=${Date.now()}`);
     }
 
-    function calculateDailyStreak(learnedSkills:SkillItem[]) {
-        return 0;
+    function calculateDailyStreak(learnedSkills: SkillItem[]): number {
+        if (learnedSkills.length === 0) {
+            return 0; // No skills learned, streak is zero
+        }
+
+        //Extract unique learning dates as YYYY-MM-DD strings
+        const datesSet = new Set(
+            learnedSkills.map(skill => {
+            const d = new Date(skill.date_learned);
+            return d.toISOString().slice(0, 10); 
+            })
+        );
+
+        // Convert set to array and sort newest to oldest
+        const dates = Array.from(datesSet).sort((a, b) => (a < b ? 1 : -1));
+
+        //Get today's date string for comparison
+        const today = new Date();
+        const todayStr = today.toISOString().slice(0, 10);
+
+        // Check if user learned something today or yesterday (start point)
+        // If no learning on today or yesterday, streak is 0
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+        if (dates[0] !== todayStr && dates[0] !== yesterdayStr) {
+            return 0;
+        }
+
+        // Step 4: Count streak
+        let streak = 1; // count first day
+
+        for (let i = 1; i < dates.length; i++) {
+            // Calculate difference in days between current and previous date
+            const prevDate = new Date(dates[i - 1]);
+            const currDate = new Date(dates[i]);
+
+            const diffInTime = prevDate.getTime() - currDate.getTime();
+            const diffInDays = diffInTime / (1000 * 60 * 60 * 24);
+
+            if (diffInDays === 1) {
+            streak++; // consecutive day, increase streak
+            } else {
+            break; // streak broken, stop counting
+            }
+        }
+
+        return streak;
     }
 
     useEffect(() => {
@@ -123,7 +170,7 @@ function ProfilePage() {
                     setAvatarUrl(data.publicUrl + `?t=${Date.now()}`);
                 }
             } else {
-                setAvatarUrl(null); // Ensure it's cleared
+                setAvatarUrl(null); 
             }
         }
 

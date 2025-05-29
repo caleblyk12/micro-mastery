@@ -47,7 +47,7 @@ function CategoryPage() {
                 {/* Back Button */}
                 <button
                 onClick={() => navigate('/nav/categories')}
-                className="self-start mb-6 text-blue-600 hover:text-blue-800 font-semibold"
+                className="self-start mb-6 text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
                 >
                 ← Back to Categories
                 </button>
