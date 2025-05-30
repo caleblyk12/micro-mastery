@@ -220,6 +220,7 @@ function ProfilePage() {
         
     }, [userId]); 
 
+    //streak useEffect
     useEffect(() => {
         if (learnedSkills.length === 0) {
             setDailyStreak(0);
