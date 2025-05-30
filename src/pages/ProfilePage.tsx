@@ -124,9 +124,9 @@ function ProfilePage() {
             const diffInDays = diffInTime / (1000 * 60 * 60 * 24);
 
             if (diffInDays === 1) {
-            streak++; // consecutive day, increase streak
+                streak++; // consecutive day, increase streak
             } else {
-            break; // streak broken, stop counting
+                break; // streak broken, stop counting
             }
         }
 
