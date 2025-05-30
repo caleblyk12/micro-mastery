@@ -114,7 +114,7 @@ function ProfilePage() {
 
         // Step 4: Count streak
         let streak = 1; // count first day
-
+ 
         for (let i = 1; i < dates.length; i++) {
             // Calculate difference in days between current and previous date
             const prevDate = new Date(dates[i - 1]);
@@ -129,6 +129,9 @@ function ProfilePage() {
                 break; // streak broken, stop counting
             }
         }
+
+        console.log("Raw date_learned:", learnedSkills[0]?.date_learned);
+        console.log("Parsed dates:", dates);
 
         return streak;
     }
@@ -193,7 +196,8 @@ function ProfilePage() {
 
     useEffect(() => {
         if (userId === '') return; 
-
+        //debugger
+        console.log("Fetching learned skills...");
         async function fetchLearnedSkills() {
             const { data: skillData, error: skillError } = await supabase
             .from('users_learned_skills')
@@ -204,6 +208,8 @@ function ProfilePage() {
                 console.error('Error fetching skills:', skillError.message);
                 setErrorMessage(skillError.message);
             } else {
+                //debugger
+                console.log("Fetched skills:", skillData);
                 const formattedSkills = (skillData as unknown as RawSkillData[])
                     .map((x) => ({
                         date_learned: new Date(x.learned_at).toLocaleDateString(),
@@ -222,10 +228,14 @@ function ProfilePage() {
 
     //streak useEffect
     useEffect(() => {
+        //debugger
+        console.log('entering streak useEffect');
         if (learnedSkills.length === 0) {
             setDailyStreak(0);
             return;
         }
+        //debugger
+        console.log('calling calcstreak function');
         const streak = calculateDailyStreak(learnedSkills);
         setDailyStreak(streak);
     }, [learnedSkills]);
