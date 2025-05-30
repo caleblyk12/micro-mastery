@@ -84,6 +84,8 @@ function ProfilePage() {
 
     function calculateDailyStreak(learnedSkills: SkillItem[]): number {
         if (learnedSkills.length === 0) {
+            //debugger
+            console.log('returning early because nth learnt');
             return 0; // No skills learned, streak is zero
         }
 
@@ -91,31 +93,39 @@ function ProfilePage() {
         const datesSet = new Set(
             learnedSkills.map(skill => {
             const d = new Date(skill.date_learned);
-            return d.toISOString().slice(0, 10); 
+            return d.toLocaleDateString('en-CA'); 
             })
         );
 
         // Convert set to array and sort newest to oldest
         const dates = Array.from(datesSet).sort((a, b) => (a < b ? 1 : -1));
+        //debugger
+        console.log(dates);
 
         //Get today's date string for comparison
         const today = new Date();
-        const todayStr = today.toISOString().slice(0, 10);
+        const todayStr = today.toLocaleDateString('en-CA');
 
         // Check if user learned something today or yesterday (start point)
         // If no learning on today or yesterday, streak is 0
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().slice(0, 10);
+        const yesterdayStr = yesterday.toLocaleDateString('en-CA');
 
         if (dates[0] !== todayStr && dates[0] !== yesterdayStr) {
+            //debugger
+            console.log('returning because nth learnt tdy or ytd');
             return 0;
         }
 
         // Step 4: Count streak
         let streak = 1; // count first day
+        //debugger
+        console.log('streak set to 1');
  
         for (let i = 1; i < dates.length; i++) {
+            //debugger
+            console.log('entering for loop');
             // Calculate difference in days between current and previous date
             const prevDate = new Date(dates[i - 1]);
             const currDate = new Date(dates[i]);
@@ -212,7 +222,7 @@ function ProfilePage() {
                 console.log("Fetched skills:", skillData);
                 const formattedSkills = (skillData as unknown as RawSkillData[])
                     .map((x) => ({
-                        date_learned: new Date(x.learned_at).toLocaleDateString(),
+                        date_learned: x.learned_at,
                         skill_id: x.skills.id,
                         skill_title: x.skills.title,
                         category_title: x.skills.categories.title
