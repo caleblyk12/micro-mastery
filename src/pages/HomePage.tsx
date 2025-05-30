@@ -25,7 +25,7 @@ function HomePage() {
     return(
         <div className='flex flex-col gap-4 items-center mt-[50px]'>
             <h1 className='text-5xl'>Welcome back <span className='font-bold'>{username}</span></h1>
-            <p>test</p>
+            <p></p>
         </div>
     );
 }

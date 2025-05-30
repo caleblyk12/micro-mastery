@@ -69,10 +69,17 @@ function ProfilePage() {
         }
 
         // Get the public URL of the uploaded avatar
-        const { data: publicUrlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-        setAvatarUrl(publicUrlData.publicUrl + `?t=${Date.now()}`);
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+            .from('avatars')
+            .createSignedUrl(filePath, 60); // URL valid for 60 seconds
+
+        if (signedUrlError) {
+            console.error('Failed to generate avatar URL: ' + signedUrlError.message);
+            setErrorMessage('Failed to generate avatar URL: ' + signedUrlError.message);
+            return;
+        }
+
+        setAvatarUrl(signedUrlData?.signedUrl ?? null);
     }
 
     function calculateDailyStreak(learnedSkills: SkillItem[]): number {
@@ -165,10 +172,17 @@ function ProfilePage() {
 
             const fileExists = files?.some(file => file.name === `${userId}-avatar`);
             if (fileExists) {
-                const { data } = supabase.storage.from('avatars').getPublicUrl(`${userId}-avatar`);
-                if (data?.publicUrl) {
-                    setAvatarUrl(data.publicUrl + `?t=${Date.now()}`);
+                const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+                    .from('avatars')
+                    .createSignedUrl(`${userId}-avatar`, 60);
+
+                if (signedUrlError) {
+                    console.error("Error generating signed URL:", signedUrlError.message);
+                    setErrorMessage(signedUrlError.message);
+                    return;
                 }
+
+                setAvatarUrl(signedUrlData?.signedUrl ?? null);
             } else {
                 setAvatarUrl(null); 
             }
