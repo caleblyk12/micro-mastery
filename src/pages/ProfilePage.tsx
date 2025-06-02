@@ -3,6 +3,8 @@ import { supabase } from "../helpers/supabaseClient";
 import SkillCard from "../components/SkillCard";
 import placeholder from '../assets/placeholder-avatar.jpg'
 import { Trash2 } from "lucide-react";
+import { ALL_ACHIEVEMENTS } from "../helpers/Achievements";
+
 
 interface RawSkillData {
   learned_at: string;
@@ -32,6 +34,44 @@ function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [dailyStreak, setDailyStreak] = useState<number>(0);
+    const [unlockedAchievements, setUnlockedAchievements] = useState<number[]>([]);
+
+
+    async function fetchUnlockedAchievements(userId: string) {
+        const { data, error } = await supabase
+            .from("achievements_unlocked")
+            .select("achievement_id")
+            .eq("user_id", userId);
+
+        if (error) {
+            console.error("Failed to fetch unlocked achievements:", error.message);
+            setErrorMessage(error.message);
+            return;
+        }
+
+        const ids = data.map((row) => row.achievement_id);
+        setUnlockedAchievements(ids);
+    }
+
+    async function checkAndUnlockAchievements(userId: string, skills: SkillItem[], streak: number) {
+        for (const achievement of ALL_ACHIEVEMENTS) {
+            const alreadyUnlocked = unlockedAchievements.includes(achievement.id);
+            const meetsCondition = achievement.condition(skills, streak);
+
+            if (!alreadyUnlocked && meetsCondition) {
+            const { error } = await supabase.from("achievements_unlocked").insert({
+                user_id: userId,
+                achievement_id: achievement.id,
+            });
+
+            if (error) {
+                console.error("Error unlocking achievement:", error.message);
+            } else {
+                setUnlockedAchievements((prev) => [...prev, achievement.id]);
+            }
+            }
+        }
+    }
 
 
     async function handleDeleteAvatar() {
@@ -229,6 +269,7 @@ function ProfilePage() {
                 }))
                 setLearnedSkills(formattedSkills);
             }
+            fetchUnlockedAchievements(userId);
             setLoading(false);
         }
 
@@ -236,7 +277,7 @@ function ProfilePage() {
         
     }, [userId]); 
 
-    //streak useEffect
+    //streak useEffect (everytime learnedSkills changes, update streak and achievements)
     useEffect(() => {
         //debugger
         console.log('entering streak useEffect');
@@ -248,6 +289,7 @@ function ProfilePage() {
         console.log('calling calcstreak function');
         const streak = calculateDailyStreak(learnedSkills);
         setDailyStreak(streak);
+        checkAndUnlockAchievements(userId, learnedSkills, streak);
     }, [learnedSkills]);
 
 
@@ -299,9 +341,10 @@ function ProfilePage() {
             </div>
 
             {/*streak*/}
-            <div className="mb-[17%] text-white text-2xl text-center font-semibold bg-black rounded-4xl py-2">
+            <div className="mb-[10%] text-white text-2xl text-center font-semibold bg-black rounded-4xl py-2">
                 Current Learning Streak: {dailyStreak} {dailyStreak === 1 ? 'day' : 'days'}
             </div>
+
 
             {/* Skills */}
             <h3 className="text-2xl font-bold mb-4 text-center">Learned Skills</h3>
@@ -319,6 +362,31 @@ function ProfilePage() {
                     ))}
                 </div>
             )}
+
+
+            {/* Achievements */}
+            <div className="my-6 mt-[70px]">
+                <h3 className="text-2xl font-bold text-center mb-4">Achievements</h3>
+                <div className="flex flex-wrap gap-3 justify-center">
+                    {ALL_ACHIEVEMENTS.map((a) => (
+                        <div key={a.id} className="relative group">
+                            <div
+                            className={`p-3 rounded-xl border shadow-md text-sm font-medium ${
+                                unlockedAchievements.includes(a.id)
+                                ? "bg-blue-100 border-blue-500 text-blue-800"
+                                : "bg-gray-100 text-gray-400 border-gray-300"
+                            }`}
+                            >
+                                {a.title}
+                            </div>
+
+                            <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1 z-10 max-w-[200px] text-center">
+                                {a.desc}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
     </div>
   );
 }
