@@ -1,8 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import orbitalDog from '../assets/orbitalDog256.png';
+import { supabase } from '../helpers/supabaseClient';
 
 function NavBar() {
     const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut(); 
+        navigate('/'); 
+    };
 
     return (
         <>
@@ -14,7 +20,7 @@ function NavBar() {
 
             {/* Logout button below icon */}
             <button
-                onClick={() => navigate('/')}
+                onClick={handleLogout}
                 className="fixed top-6 right-6 z-50 button-default"
             >
                 Logout
