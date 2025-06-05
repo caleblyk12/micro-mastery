@@ -30,6 +30,57 @@ function SkillPage() {
     setShowQuiz(true);
   };
 
+  async function handleSkillLearnt(){
+    if (skill === null) return;
+
+    if (score === totalQuestions) {
+      const { data: userData, error: getUserError } = await supabase.auth.getUser();
+      if (getUserError || !userData) {
+        console.error('Error fetching user ID:', getUserError?.message);
+        return;
+      }
+      const userId = userData.user.id;
+
+      const { error: insertError } = await supabase.from('users_learned_skills').insert({
+        user_id: userId,
+        skill_id: skill.id
+      });
+
+      if (insertError && !insertError.message.includes('duplicate key')) {
+        console.error('Error recording skill:', insertError.message);
+      }
+
+      // Count total learned skills
+      const { count, error: countError } = await supabase
+        .from("users_learned_skills")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId);
+
+      if (countError) {
+        console.error("Error counting learned skills:", countError.message);
+      } else {
+        const skillsLearnt = count ?? 0;
+        const points = skillsLearnt * 20;
+        const level = Math.floor(points / 100);
+
+        const { error: profileUpdateError } = await supabase
+          .from("profiles")
+          .update({
+            skills_learnt: skillsLearnt,
+            points,
+            level,
+          })
+          .eq("id", userId);
+
+        if (profileUpdateError) {
+          console.error("Failed to update profile stats:", profileUpdateError.message);
+        }
+      }
+    }
+
+    navigate('/nav/profile');
+  }
+
   return (
     <>
       {skill ? (
@@ -108,26 +159,7 @@ function SkillPage() {
                 )}
 
                 <button
-                  onClick={async () => {
-                    if (score === totalQuestions) {
-                      const { data: userData, error: getUserError } = await supabase.auth.getUser();
-                      if (getUserError || !userData) {
-                        console.error('Error fetching user ID:', getUserError?.message);
-                        return;
-                      }
-
-                      const { error } = await supabase.from('users_learned_skills').insert({
-                        user_id: userData.user.id,
-                        skill_id: skill.id
-                      });
-
-                      if (error && !error.message.includes('duplicate key')) {
-                        console.error('Error recording skill:', error.message);
-                      }
-                    }
-
-                    navigate('/nav/profile');
-                  }}
+                  onClick={handleSkillLearnt}
                   className="bg-blue-700 text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-blue-900 transition-colors duration-200"
                 >
                   Go to Profile

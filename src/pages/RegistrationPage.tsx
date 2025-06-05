@@ -11,18 +11,36 @@ function RegistrationPage() {
     const [loading, setLoading] = useState(false);
 
     async function handleRegister() {
-        const {error} = await supabase.auth.signUp({email: email, password: password});
+        const {data, error} = await supabase.auth.signUp({email: email, password: password});
         setEmail('');
         setPassword('');
 
         if (error) {
             console.error('error signing up', error.message);
             setErrorMessage(error.message);
-        } else {
             setLoading(false);
-            setErrorMessage('');
-            navigate('/registered')
+            return;
         }
+
+        const user = data.user;
+        if(!user){
+            setErrorMessage('Signup successful but no user data returned');
+            setLoading(false);
+            return;
+        }
+
+        const {error: profileError} = await supabase.from('profiles').insert([{id: user.id}]);
+        if(profileError){
+            console.error('error adding profile to users', profileError.message);
+            setErrorMessage('signup successful, but failed to create profile...');
+            setLoading(false);
+            return;
+        }
+
+        setLoading(false);
+        setErrorMessage('');
+        navigate('/registered')
+        
     }
 
     return(

@@ -53,9 +53,9 @@ function ProfilePage() {
         setUnlockedAchievements(ids);
     }
 
-    async function checkAndUnlockAchievements(userId: string, skills: SkillItem[], streak: number) {
+    async function checkAndUnlockAchievements(userId: string, skills: SkillItem[], streak: number, unlocked: number[]) {
         for (const achievement of ALL_ACHIEVEMENTS) {
-            const alreadyUnlocked = unlockedAchievements.includes(achievement.id);
+            const alreadyUnlocked = unlocked.includes(achievement.id);
             const meetsCondition = achievement.condition(skills, streak);
 
             if (!alreadyUnlocked && meetsCondition) {
@@ -186,6 +186,7 @@ function ProfilePage() {
         return streak;
     }
 
+    //useEffect for getting and setting user data locally on mount
     useEffect(() => {
         async function fetchUser() {
             const {data: userData, error: userError} = await supabase.auth.getUser();
@@ -208,6 +209,8 @@ function ProfilePage() {
         fetchUser();
     }, [])
 
+
+    //useEffect for avatar stuff
     useEffect(() => {
         if (!userId) return;
 
@@ -244,6 +247,9 @@ function ProfilePage() {
         checkAvatarExists();
     }, [userId]);
 
+
+
+    //useEffect for fetching learned skills, achievements and formatting it in local storage on mount
     useEffect(() => {
         if (userId === '') return; 
         //debugger
@@ -269,13 +275,14 @@ function ProfilePage() {
                 }))
                 setLearnedSkills(formattedSkills);
             }
-            fetchUnlockedAchievements(userId);
+            await fetchUnlockedAchievements(userId);
             setLoading(false);
         }
 
         fetchLearnedSkills();
         
     }, [userId]); 
+
 
     //streak useEffect (everytime learnedSkills changes, update streak and achievements)
     useEffect(() => {
@@ -289,8 +296,14 @@ function ProfilePage() {
         console.log('calling calcstreak function');
         const streak = calculateDailyStreak(learnedSkills);
         setDailyStreak(streak);
-        checkAndUnlockAchievements(userId, learnedSkills, streak);
-    }, [learnedSkills]);
+
+        (async () => {
+            const { error } = await supabase.from('profiles').update({ curr_streak: streak }).eq('id', userId);
+            if (error) console.error('error updating profile streak', error.message);
+            await checkAndUnlockAchievements(userId, learnedSkills, streak, unlockedAchievements);
+        })();
+
+    }, [learnedSkills, userId]);
 
 
 
