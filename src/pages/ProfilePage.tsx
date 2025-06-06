@@ -35,7 +35,29 @@ function ProfilePage() {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [dailyStreak, setDailyStreak] = useState<number>(0);
     const [unlockedAchievements, setUnlockedAchievements] = useState<number[]>([]);
+    const [level, setLevel] = useState<number>(0);
+    const [xp, setXP] = useState<number>(0);
 
+
+    async function fetchLevelDetails(userId: string) {
+        const {data: levelData, error: levelError} = await supabase.from('profiles').select('level').eq('id', userId).single();
+        const {data: xpData, error:xpError} = await supabase.from('profiles').select('points').eq('id', userId).single();
+        
+        if(levelError || !levelData){
+            console.error('error retrieving level', levelError.message);
+            setErrorMessage('Couldnt retrieve user level');
+            return;
+        }
+
+        if(xpError || !xpData) {
+            console.error('Error retrieving xp points', xpError.message);
+            setErrorMessage('Couldnt retrieve XP points');
+            return;
+        }
+
+        setLevel(levelData.level);
+        setXP(xpData.points % 100);
+    }
 
     async function fetchUnlockedAchievements(userId: string) {
         const { data, error } = await supabase
@@ -276,6 +298,7 @@ function ProfilePage() {
                 setLearnedSkills(formattedSkills);
             }
             await fetchUnlockedAchievements(userId);
+            await fetchLevelDetails(userId);
             setLoading(false);
         }
 
@@ -320,6 +343,20 @@ function ProfilePage() {
         <div className="p-6 max-w-4xl mx-auto">
             {errorMessage && <strong>{errorMessage}</strong>}
 
+            {/*levelling stuff */}
+            <div className="bg-white shadow-md rounded-xl p-4 w-full max-w-md border mb-[40px] border-gray-200">
+                <p className="text-lg font-semibold text-black">Level: {level}</p>
+                <p className="text-lg font-semibold text-gray-500">Current XP: </p>
+                
+                {/*xp bar */}
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
+                    <div
+                        className="bg-blue-600 h-3 rounded-full"
+                        style={{ width: `${xp}%` }}
+                    ></div>
+                </div>
+            </div>
+
             {/* Profile Picture Placeholder */}
             <div className="flex flex-col items-center mb-4">
                 <div className="relative w-48 h-48 md:w-40 md:h-40">
@@ -348,9 +385,10 @@ function ProfilePage() {
                         className="hidden"
                     />
                 </label>
-                
+                {/*name, basic info */}
                 <h2 className="text-3xl font-bold">{username}</h2>
                 <p className="text-gray-500">Joined on: {joinedDate}</p>
+                
             </div>
 
             {/*streak*/}
