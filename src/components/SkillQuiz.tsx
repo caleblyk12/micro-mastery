@@ -15,22 +15,38 @@ interface QuizWithOptions extends Quiz {
 }
 
 interface SkillQuizProps {
-  skillId: number;
+  skillId: number | undefined;
   onComplete: (correctCount: number, resultsArray: any[]) => void;
 }
 
 function SkillQuiz({ skillId, onComplete }: SkillQuizProps) {
-  //const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [submitted, setSubmitted] = useState(false);
   const [shuffledQuizzes, setShuffledQuizzes] = useState<QuizWithOptions[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!skillId) {
+      console.warn('❗️ SkillQuiz loaded with undefined skillId');
+      setIsLoading(false);
+      setFetchError('Invalid skill ID.');
+      return;
+    }
+
     async function fetchQuiz() {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('quizzes')
         .select('*')
         .eq('skill_id', skillId);
+
+      if (error) {
+        console.error('Error fetching quizzes:', error.message);
+        setFetchError('Failed to load quiz questions.');
+        setIsLoading(false);
+        return;
+      }
 
       if (data) {
         const withShuffledOptions = data.map((q) => ({
@@ -39,9 +55,10 @@ function SkillQuiz({ skillId, onComplete }: SkillQuizProps) {
             .sort(() => Math.random() - 0.5),
         }));
         setShuffledQuizzes(withShuffledOptions);
-      } else {
-        console.error('Error fetching quizzes:', error?.message);
+        setFetchError(null);
       }
+
+      setIsLoading(false);
     }
 
     fetchQuiz();
@@ -71,6 +88,22 @@ function SkillQuiz({ skillId, onComplete }: SkillQuizProps) {
     }, 500);
   };
 
+  if (isLoading) {
+    return (
+      <div className="text-center mt-8 text-gray-500">
+        Loading quiz questions...
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="text-center mt-8 text-red-600">
+        {fetchError}
+      </div>
+    );
+  }
+
   if (shuffledQuizzes.length === 0 && !submitted) {
     return (
       <div className="text-center mt-8">
@@ -83,35 +116,31 @@ function SkillQuiz({ skillId, onComplete }: SkillQuizProps) {
     <div className="bg-gray-50 p-4 rounded-xl shadow-lg max-w-2xl mx-auto mt-6 mb-[50px]">
       <h2 className="text-xl font-bold mb-4">Quiz</h2>
 
-      {shuffledQuizzes.map((q) => {
-        const options = q.options;
-
-        return (
-          <div key={q.id} className="mb-6">
-            <p className="font-medium mb-2">{q.question}</p>
-            {options.map((opt) => (
-              <label key={opt} className="block mb-1">
-                <input
-                  type="radio"
-                  name={`question-${q.id}`}
-                  value={opt}
-                  checked={answers[q.id] === opt}
-                  disabled={submitted}
-                  onChange={() => handleChange(q.id, opt)}
-                />
-                <span className="ml-2">{opt}</span>
-              </label>
-            ))}
-            {submitted && (
-              <p className="text-sm mt-1">
-                {answers[q.id] === q.correct_answer
-                  ? '✅ Correct'
-                  : '❌ Incorrect'}
-              </p>
-            )}
-          </div>
-        );
-      })}
+      {shuffledQuizzes.map((q) => (
+        <div key={q.id} className="mb-6">
+          <p className="font-medium mb-2">{q.question}</p>
+          {q.options.map((opt) => (
+            <label key={opt} className="block mb-1">
+              <input
+                type="radio"
+                name={`question-${q.id}`}
+                value={opt}
+                checked={answers[q.id] === opt}
+                disabled={submitted}
+                onChange={() => handleChange(q.id, opt)}
+              />
+              <span className="ml-2">{opt}</span>
+            </label>
+          ))}
+          {submitted && (
+            <p className="text-sm mt-1">
+              {answers[q.id] === q.correct_answer
+                ? '✅ Correct'
+                : '❌ Incorrect'}
+            </p>
+          )}
+        </div>
+      ))}
 
       {!submitted && (
         <button
