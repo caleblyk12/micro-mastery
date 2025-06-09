@@ -52,6 +52,14 @@ function NavBar() {
                 >
                     Categories
                 </NavLink>
+                <NavLink
+                    to="/nav/mystery"
+                    className={({ isActive }) =>
+                        isActive ? 'text-blue-700 font-semibold' : 'text-gray-800'
+                    }
+                >
+                    Mystery
+                </NavLink>
             </div>
 
             {/* Spacer to avoid overlap with fixed navbar */}

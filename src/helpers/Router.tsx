@@ -13,6 +13,7 @@ import CategoriesPage from "../pages/CategoriesPage";
 import Wrapper from "./Wrapper";
 import CategoryPage from "../pages/CategoryPage";
 import SkillPage from "../pages/SkillPage";
+import MysteryPage from "../pages/MysteryPage";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
             {
                 path: 'skill/:id',
                 element: <SkillPage/>
+            },
+            {
+                path: 'mystery',
+                element: <MysteryPage/>
             }
         ]
     }
