@@ -46,7 +46,7 @@ function SettingsPage() {
       .eq("id", user.id);
 
     if (error) {
-      setMessage("Failed to update username.");
+      setMessage("Failed to update username. It might be taken already!");
     } else {
       setMessage("Username updated successfully.");
     }
