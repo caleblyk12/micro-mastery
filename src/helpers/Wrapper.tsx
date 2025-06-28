@@ -1,52 +1,85 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from './supabaseClient';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 interface WrapperProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
-function Wrapper({children}: WrapperProps) {
+function Wrapper({ children }: WrapperProps) {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const [authenticated, setAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
 
-    useEffect(() => {
-        const getSession = async () => {
-            const {data} = await supabase.auth.getSession();
-            const sess = data.session;
+      setAuthenticated(session !== null);
+      setLoading(false);
 
-            setAuthenticated(sess !== null);
-            setLoading(false);
+      if (session?.user) {
+        await handleUsernameCheck(session.user.id, session.user.email ?? '');
+      }
+    };
+
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setAuthenticated(session !== null);
+
+        if (event === "SIGNED_IN" && session?.user) {
+          await handleUsernameCheck(session.user.id, session.user.email ?? '');
         }
+      }
+    );
 
-        getSession();
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
 
-        //authstatechange function will automatically start listening and executing on changes, and it returns an object that has subscribe n unsubscribe
-        //we are renaming this object to auth listener, for purposes of cleanup during unmount
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setAuthenticated(session !== null);
-        });
+  const handleUsernameCheck = async (userId: string, email: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single();
 
-        //cleanup
-        return () => {
-            authListener.subscription.unsubscribe();
-        };
-        
-    }, []);
-
-
-
-    if(loading) {
-        return <div>Loading...</div>;
-    } else{
-        if(authenticated){
-            return <>{children}</>;
-        } else {
-            return <Navigate to='/login'/>;
-        }
+    if (error) {
+      console.error('Error checking username:', error.message);
+      return;
     }
+
+    if (!data?.username) {
+      const emailPrefix = email.split('@')[0];
+
+      // Set username if null
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ username: emailPrefix })
+        .eq('id', userId)
+        .is('username', null); // only set if still null
+
+      if (updateError) {
+        console.error('Error auto-setting username:', updateError.message);
+        return;
+      }
+
+      // Redirect to settings page to let user change it
+      if (location.pathname !== '/nav/settings') {
+        navigate('/nav/settings');
+      }
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return authenticated ? <>{children}</> : <Navigate to="/login" />;
 }
 
 export default Wrapper;

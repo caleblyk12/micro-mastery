@@ -18,7 +18,7 @@ function NavBar() {
                 <span className="text-lg font-bold">Micro-Mastery</span>
             </div>
 
-            {/* Logout button below icon */}
+            {/* Logout button */}
             <button
                 onClick={handleLogout}
                 className="fixed top-6 right-6 z-50 button-default"
@@ -52,9 +52,33 @@ function NavBar() {
                 >
                     Categories
                 </NavLink>
+                <NavLink
+                    to="/nav/mystery"
+                    className={({ isActive }) =>
+                        isActive ? 'text-blue-700 font-semibold' : 'text-gray-800'
+                    }
+                >
+                    Mystery
+                </NavLink>
+                <NavLink
+                    to="/nav/friends"
+                    className={({ isActive }) =>
+                        isActive ? "text-blue-700 font-semibold" : "text-gray-800"
+                    }
+                >
+                    Friends
+                </NavLink>
+                <NavLink
+                    to="/nav/settings"
+                    className={({ isActive }) =>
+                        isActive ? "text-blue-700 font-semibold" : "text-gray-800"
+                    }
+                >
+                    Settings
+                </NavLink>
             </div>
 
-            {/* Spacer to avoid overlap with fixed navbar */}
+            {/* Spacer to avoid overlap */}
             <div className="h-25" />
         </>
     );
