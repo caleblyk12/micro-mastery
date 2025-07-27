@@ -14,7 +14,7 @@ function NavBar() {
         <>
             {/* Top-left icon */}
             <div className="fixed top-8 left-6 z-50 flex items-center gap-2">
-                <img src={orbitalDog} className="w-8 h-8" />
+                <img src={orbitalDog} alt="Micro-Mastery logo" className="w-8 h-8" />
                 <span className="text-lg font-bold">Micro-Mastery</span>
             </div>
 

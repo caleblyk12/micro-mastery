@@ -41,15 +41,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/nav",
-    element: (
-      <Wrapper>
-        <LayoutParent />
-      </Wrapper>
-    ),
+    element: 
+        <LayoutParent />,
     children: [
       {
         path: "home",
-        element: <HomePage />,
+        element: (
+          <Wrapper>
+             <HomePage />
+          </Wrapper>),
       },
       {
         path: "profile",

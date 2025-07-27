@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../helpers/supabaseClient";
+import placeholder from '../assets/placeholder-avatar.jpg';
+
 
 interface Friend {
   id: string;
   username: string;
   level: number;
   points: number;
+  avatarUrl?: string;
 }
 
 function MyFriendsPage() {
@@ -19,7 +22,7 @@ function MyFriendsPage() {
     async function fetchFriends() {
       const {
         data: { user },
-        error: userError
+        error: userError,
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
@@ -39,9 +42,24 @@ function MyFriendsPage() {
         return;
       }
 
-      setFriends(data);
+      const friendsWithAvatars: Friend[] = await Promise.all(
+        data.map(async (friend: Friend) => {
+          const filePath = `${friend.id}-avatar`;
+          const { data: avatarData, error: avatarError } = await supabase.storage
+            .from("avatars")
+            .createSignedUrl(filePath, 60);
+
+          return {
+            ...friend,
+            avatarUrl: avatarError ? null : avatarData?.signedUrl ?? null,
+          };
+        })
+      );
+
+      setFriends(friendsWithAvatars);
       setLoading(false);
     }
+
 
     fetchFriends();
   }, []);
@@ -83,12 +101,19 @@ function MyFriendsPage() {
           {friends.map((friend) => (
             <div
               key={friend.id}
-              className="bg-white border border-gray-200 rounded-xl p-4 shadow hover:shadow-md cursor-pointer"
+              className="bg-white border border-gray-200 rounded-xl p-4 shadow hover:shadow-md cursor-pointer flex items-center gap-4"
               onClick={() => navigate(`/nav/friends/${friend.id}`)}
             >
-              <h2 className="text-xl font-semibold">{friend.username}</h2>
-              <p className="text-gray-600">Level: {friend.level}</p>
-              <p className="text-gray-600">XP: {friend.points % 100}</p>
+              <img
+                src={friend.avatarUrl || placeholder}
+                className="w-16 h-16 rounded-full border border-gray-300 object-cover"
+                alt={`${friend.username}'s avatar`}
+              />
+              <div>
+                <h2 className="text-xl font-semibold">{friend.username}</h2>
+                <p className="text-gray-600">Level: {friend.level}</p>
+                <p className="text-gray-600">XP: {friend.points % 100}</p>
+              </div>
             </div>
           ))}
         </div>

@@ -64,7 +64,6 @@ function CategoryPage() {
                     className="flex flex-col justify-between bg-gray-100 hover:bg-gray-200 text-black  py-4 px-6 rounded-2xl shadow-md transition-colors duration-200 ease-in-out cursor-pointer text-lg font-medium text-center"
                     >
                         <p className='mb-2'>{skill.title}</p>
-                        <p className='text-sm text-gray-500'>Duration: x minutes</p>
                     </Link>
                 ))}
                 </div>

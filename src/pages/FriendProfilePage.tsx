@@ -1,7 +1,8 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../helpers/supabaseClient";
 import { ALL_ACHIEVEMENTS } from "../helpers/Achievements";
+import placeholder from "../assets/placeholder-avatar.jpg";
 
 function FriendProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -9,6 +10,8 @@ function FriendProfilePage() {
   const [learnedSkills, setLearnedSkills] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!id) return;
@@ -18,7 +21,7 @@ function FriendProfilePage() {
       const currentUserId = session?.user?.id;
       if (!currentUserId) return;
 
-      // Check friendship in either direction
+      // Check if friendship exists in either direction
       const { data: friendCheck1 } = await supabase
         .from("friends")
         .select()
@@ -29,9 +32,11 @@ function FriendProfilePage() {
         .select()
         .match({ user_id: id, friend_id: currentUserId, status: "accepted" });
 
-      if (
-        !((friendCheck1 && friendCheck1.length > 0) || (friendCheck2 && friendCheck2.length > 0))
-      ) {
+      const isFriend =
+        (friendCheck1 && friendCheck1.length > 0) ||
+        (friendCheck2 && friendCheck2.length > 0);
+
+      if (!isFriend) {
         setFriendProfile(null);
         setLoading(false);
         return;
@@ -43,15 +48,25 @@ function FriendProfilePage() {
         .select("username, level, points, curr_streak")
         .eq("id", id)
         .single();
-
       setFriendProfile(profile);
+
+      // Fetch avatar
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(`${id}-avatar`, 300);
+
+      if (signedUrlError) {
+        console.warn("Failed to load avatar for friend:", signedUrlError.message);
+        setAvatarUrl(null);
+      } else {
+        setAvatarUrl(signedUrlData?.signedUrl ?? null);
+      }
 
       // Fetch skills
       const { data: skillsData } = await supabase
         .from("users_learned_skills")
         .select("learned_at, skills(id, title, categories(title))")
         .eq("user_id", id);
-
       setLearnedSkills(skillsData || []);
 
       // Fetch achievements
@@ -59,9 +74,10 @@ function FriendProfilePage() {
         .from("achievements_unlocked")
         .select("achievement_id")
         .eq("user_id", id);
-
-      const unlockedIds = unlockedData ? unlockedData.map((row) => row.achievement_id) : [];
-      const matchedAchievements = ALL_ACHIEVEMENTS.filter((a) => unlockedIds.includes(a.id));
+      const unlockedIds = unlockedData?.map((row) => row.achievement_id) || [];
+      const matchedAchievements = ALL_ACHIEVEMENTS.filter((a) =>
+        unlockedIds.includes(a.id)
+      );
       setAchievements(matchedAchievements);
 
       setLoading(false);
@@ -82,15 +98,28 @@ function FriendProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
+      <button
+        onClick={() => navigate("/nav/friends")}
+        className="fixed top-20 left-6 z-40 bg-black text-white font-medium px-4 py-2 rounded-full hover:bg-gray-800"
+      >
+        ← Back
+      </button>
+
+      <div className="flex justify-center mb-6">
+        <img
+          src={avatarUrl || placeholder}
+          alt="Friend avatar"
+          className="w-32 h-32 rounded-full border border-gray-300 object-cover"
+        />
+      </div>
+
       <h1 className="text-2xl font-bold mb-2">@{friendProfile.username}</h1>
+
       <div className="bg-white shadow-md rounded-xl p-4 border mb-4">
         <p className="text-lg font-semibold text-black">Level: {friendProfile.level}</p>
         <p className="text-lg font-semibold text-gray-500">Current XP:</p>
         <div className="w-full bg-gray-200 rounded-full h-3 mt-2">
-          <div
-            className="bg-blue-600 h-3 rounded-full"
-            style={{ width: `${xp}%` }}
-          ></div>
+          <div className="bg-blue-600 h-3 rounded-full" style={{ width: `${xp}%` }}></div>
         </div>
         <p className="mt-2 text-gray-600">🔥 {friendProfile.curr_streak}-day streak</p>
       </div>
@@ -104,9 +133,7 @@ function FriendProfilePage() {
           <div className="flex flex-wrap gap-3">
             {achievements.map((a) => (
               <div key={a.id} className="relative group">
-                <div
-                  className="p-2 rounded-xl border shadow text-sm font-medium bg-blue-100 border-blue-500 text-blue-800"
-                >
+                <div className="p-2 rounded-xl border shadow text-sm font-medium bg-blue-100 border-blue-500 text-blue-800">
                   {a.title}
                 </div>
                 <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1 z-10 max-w-[200px] text-center">

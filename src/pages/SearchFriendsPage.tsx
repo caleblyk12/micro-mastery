@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../helpers/supabaseClient";
+import { useNavigate } from "react-router-dom";
+
 
 interface Profile {
   id: string;
@@ -10,28 +12,42 @@ function SearchFriendsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
   const [userId, setUserId] = useState("");
-  const [friendRequests, setFriendRequests] = useState<string[]>([]);
+  const [friendStatuses, setFriendStatuses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     async function getCurrentUserId() {
       const { data, error } = await supabase.auth.getUser();
       if (error || !data.user) return;
       setUserId(data.user.id);
-      fetchSentRequests(data.user.id);
+      fetchFriendStatuses(data.user.id);
     }
     getCurrentUserId();
   }, []);
 
-  async function fetchSentRequests(currentId: string) {
+  async function fetchFriendStatuses(currentId: string) {
     const { data, error } = await supabase
       .from("friend_requests")
-      .select("receiver_id")
-      .eq("sender_id", currentId)
-      .in("status", ["pending", "accepted"]); // ignore rejected
+      .select("sender_id, receiver_id, status")
+      .or(`sender_id.eq.${currentId},receiver_id.eq.${currentId}`);
 
     if (!error && data) {
-      setFriendRequests(data.map((r) => r.receiver_id));
+      const statusMap: Record<string, string> = {};
+
+      data.forEach((r) => {
+        const isOutgoing = r.sender_id === currentId;
+        const otherId = isOutgoing ? r.receiver_id : r.sender_id;
+
+        if (r.status === "accepted") {
+          statusMap[otherId] = "accepted";
+        } else if (isOutgoing && r.status === "pending") {
+          statusMap[otherId] = "pending";
+        }
+      });
+
+      setFriendStatuses(statusMap);
     }
   }
 
@@ -44,7 +60,7 @@ function SearchFriendsPage() {
       .neq("id", userId); // exclude self
 
     if (!error && data) {
-      setResults(data);
+      setResults(data); // even if empty
     }
     setLoading(false);
   }
@@ -58,16 +74,25 @@ function SearchFriendsPage() {
 
     if (!error) {
       alert("Friend request sent!");
-      setFriendRequests((prev) => [...prev, receiverId]);
+      setFriendStatuses((prev) => ({
+        ...prev,
+        [receiverId]: "pending",
+      }));
     } else {
       console.error("❌ Failed to send request:", error);
       alert("Failed to send friend request: " + error.message);
     }
   }
 
-
   return (
     <div className="max-w-xl mx-auto mt-10 p-4">
+      <button
+        onClick={() => navigate("/nav/friends")}
+        className="fixed top-20 left-6 z-40 bg-black text-white font-medium px-4 py-2 rounded-full hover:bg-gray-800"
+      >
+        ← Back
+      </button>
+      
       <h2 className="text-3xl font-bold mb-6 text-center">Search Friends</h2>
 
       <div className="flex mb-4">
@@ -88,6 +113,10 @@ function SearchFriendsPage() {
 
       {loading && <p>Searching...</p>}
 
+      {!loading && results.length === 0 && searchTerm && (
+        <p className="text-center text-gray-500">No users found.</p>
+      )}
+
       <ul className="space-y-4">
         {results.map((user) => (
           <li
@@ -95,7 +124,9 @@ function SearchFriendsPage() {
             className="flex justify-between items-center border rounded px-4 py-2"
           >
             <span>{user.username}</span>
-            {friendRequests.includes(user.id) ? (
+            {friendStatuses[user.id] === "accepted" ? (
+              <span className="text-green-600">Friend Added</span>
+            ) : friendStatuses[user.id] === "pending" ? (
               <span className="text-gray-500">Request Sent</span>
             ) : (
               <button

@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../helpers/supabaseClient";
+import { useNavigate } from "react-router-dom";
+
 
 function FriendRequestsPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     async function fetchRequests() {
@@ -55,6 +59,13 @@ function FriendRequestsPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      <button
+        onClick={() => navigate("/nav/friends")}
+        className="fixed top-20 left-6 z-40 bg-black text-white font-medium px-4 py-2 rounded-full hover:bg-gray-800"
+      >
+        ← Back
+      </button>
+
       <h1 className="text-2xl font-bold mb-4">👋 Friend Requests</h1>
       {requests.length === 0 ? (
         <p className="text-gray-500">No friend requests at the moment.</p>
