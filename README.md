@@ -47,7 +47,7 @@
 
 ## Get Started
 
-1. Go to [Micro-Mastery](https://micro-mastery.vercel.app)
+1. Go to [Micro-Mastery](micro-mastery.vercel.app)
 2. Sign up or log in
 3. Pick a skill and start learning—just five minutes a day!
 
