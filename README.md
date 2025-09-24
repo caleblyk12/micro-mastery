@@ -1,54 +1,98 @@
-# React + TypeScript + Vite
+# Micro-Mastery
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[**Try Micro-Mastery Now →**](https://your-deployed-app-link.com)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What is Micro-Mastery?
 
-## Expanding the ESLint configuration
+**Micro-Mastery** is your daily companion for lifelong learning. Master new skills in just five minutes a day, track your progress, and explore a world of knowledge across various categories. Whether you want to pick up a new hobby, sharpen your mind, or just have fun, Micro-Mastery makes skill-building simple, social, and rewarding.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## How It Works
+
+1. **Sign Up or Log In**  
+   Create your free account to start your learning journey.
+
+2. **Choose a Category**  
+   Browse a wide range of skill categories—there’s something for everyone.
+
+3. **Start a 5-Minute Session**  
+   Each day, complete a bite-sized lesson or quiz designed for quick progress.
+
+4. **Track Your Progress**  
+   Earn achievements, keep up your streak, gain XP and levels, and see your skills grow.
+
+5. **Connect with Friends**  
+   Add friends, view their progress, and motivate each other.
+
+6. **Discover Mystery Skills**  
+   Try something new with our surprise “Mystery” challenges!
+
+---
+
+## Key Features
+- **Email Authenticated Logins**
+- **Daily 5-Minute Skill Sessions**
+- **Videos, Quizzes for Learning**
+- **Progress Tracking & Achievements**
+- **Social Learning with Friends**
+- **Wide Range of Categories**
+- **Daily Mystery Challenges for Discovery**
+- **XP, Levels, Streaks**
+- **Customizable Profile Pictures**
+
+---
+
+## Get Started
+
+1. Go to [Micro-Mastery](https://your-deployed-app-link.com)
+2. Sign up or log in
+3. Pick a skill and start learning—just five minutes a day!
+
+---
+
+## Need Help?
+
+If you have questions or feedback, please [open an issue](https://github.com/your-username/micro-mastery/issues) or contact us at [your-email@example.com].
+
+---
+
+---
+
+## Developer & Technical Information
+
+### File Structure
+
+```
+src/
+  assets/           # Images and static assets
+  components/       # Reusable UI components
+    tests/          # Component unit tests (Jest)
+  helpers/          # Utility functions and app-wide helpers
+  pages/            # Page-level components (routes)
+  index.css         # Global styles
+  main.tsx          # App entry point
+  setupTests.ts     # Test setup
+  vite-env.d.ts     # Vite/TypeScript environment types
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Frontend:** React, TypeScript, Vite
+- **Styling:** Tailwind CSS
+- **Backend & Auth:** Supabase
+- **Testing:** Jest, React Testing Library
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### Design Principles & Architecture
+
+- **Component-Based UI:** All UI elements are modular React components for reusability and maintainability.
+- **Separation of Concerns:** Logic, UI, and data access are separated into helpers, components, and pages.
+- **Single Responsibility Principle:** Each component and helper does one thing well.
+- **Routing:** Page-level, client-side routing is handled via React Router.
+- **Testing:** Unit tests for core components ensure reliability.
+- **Row Level Security:** Ensure only authenticated and relevant users can access data.
+- **Scalability:** Folder structure supports easy feature expansion and codebase growth.
+
+---
