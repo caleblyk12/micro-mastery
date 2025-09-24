@@ -1,6 +1,6 @@
 # Micro-Mastery
 
-[**Try Micro-Mastery Now →**](https://your-deployed-app-link.com)
+[**Try Micro-Mastery Now →**](https://micro-mastery.vercel.app)
 
 ---
 
@@ -47,7 +47,7 @@
 
 ## Get Started
 
-1. Go to [Micro-Mastery](https://your-deployed-app-link.com)
+1. Go to [Micro-Mastery](https://micro-mastery.vercel.app)
 2. Sign up or log in
 3. Pick a skill and start learning—just five minutes a day!
 
@@ -55,7 +55,7 @@
 
 ## Need Help?
 
-If you have questions or feedback, please [open an issue](https://github.com/your-username/micro-mastery/issues) or contact us at [your-email@example.com].
+If you have questions or feedback, please [open an issue](https://github.com/clyk12/micro-mastery/issues) or contact us at [caleblyk12@gmail.com].
 
 ---
 
@@ -84,6 +84,7 @@ src/
 - **Styling:** Tailwind CSS
 - **Backend & Auth:** Supabase
 - **Testing:** Jest, React Testing Library
+- **Deployment, CI/CD:** Vercel
 
 ### Design Principles & Architecture
 
